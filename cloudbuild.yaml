@@ -1,0 +1,36 @@
+steps:
+  # Step 1: Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-t',
+      'gcr.io/angular-vector-456406-i8/myapp:latest',
+      '.'
+    ]
+
+  # Step 2: Push Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'push',
+      'gcr.io/angular-vector-456406-i8/myapp:latest'
+    ]
+
+  # Step 3: Deploy to Cloud Run with VPC connector
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: [
+      'run',
+      'deploy',
+      'extractor-service',  # Your Cloud Run service name
+      '--image=gcr.io/angular-vector-456406-i8/myapp:latest',
+      '--region=us-central1',
+      '--platform=managed',
+      '--vpc-connector=my-vpc-connector',
+      '--allow-unauthenticated'
+    ]
+
+images:
+  - 'gcr.io/angular-vector-456406-i8/myapp:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
